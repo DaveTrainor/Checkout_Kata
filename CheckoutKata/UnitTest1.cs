@@ -1,4 +1,4 @@
-namespace ZenCheckoutKata
+namespace CheckoutKata
 {
     public class UnitTest1
     {
