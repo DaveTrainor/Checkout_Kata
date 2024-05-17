@@ -9,29 +9,36 @@ namespace CheckoutKata
 
         public int GetTotal()
         {
-            Dictionary<Product, int> aggregatedBasket = new();
+            var aggregatedBasket = new List<ProductWithQuantity>();
             foreach(var product in Basket.Distinct())
             {
-                aggregatedBasket.Add(product, Basket.Count(p => p.Id == product.Id));
+                aggregatedBasket.Add(new ProductWithQuantity() 
+                { 
+                    Id = product.Id,
+                    Name = product.Name,
+                    Price = product.Price,
+                    Quantity = Basket.Count(p => p.Id == product.Id)
+                });
             }
             
-            foreach(var item in aggregatedBasket) 
+            foreach(var productWithQuantity in aggregatedBasket) 
             {
-                var product = item.Key;
-                var productQuantity = item.Value;
-
-                foreach(var offer in SpecialPrices.OfferList)
-                {
-                    if(product.Id == offer.productId)
-                    {
-                        Total += productQuantity / offer.quantity * offer.specialPrice;
-                        productQuantity = productQuantity % offer.quantity;
-                    }
-                }
-                Total += productQuantity * product.Price;
+                applySpecialPrices(productWithQuantity);
+                Total += productWithQuantity.Quantity * productWithQuantity.Price;
             }
+            return Total;
+        }
 
-                return Total;
+        private void applySpecialPrices(ProductWithQuantity productWithQuantity)
+        {
+            foreach (var offer in SpecialPrices.OfferList)
+            {
+                if (productWithQuantity.Id == offer.productId)
+                {
+                    Total += productWithQuantity.Quantity / offer.quantity * offer.specialPrice;
+                    productWithQuantity.Quantity = productWithQuantity.Quantity % offer.quantity;
+                }
+            }
         }
 
         public void AddProduct(Product product)

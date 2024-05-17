@@ -67,6 +67,35 @@ namespace CheckoutKata.Tests
 
             }
 
+            [Theory]
+            [MemberData(nameof(ValidBasketsWithTotalCost))]
+            public void checkout_givenMultipleProductsQualifyingForOffers_CalculatesTotal(int expected, List<Product> basket)
+            {
+                //Arrange
+                
+                var checkout = new Checkout();
+
+                //Act
+                foreach (var product in basket)
+                {
+                    checkout.AddProduct(product);
+                }
+                var result = checkout.GetTotal();
+
+                //Assert
+                Assert.Equal(expected, result);
+            }
+
+            public static TheoryData<int, List<Product>> ValidBasketsWithTotalCost()
+            {
+                return new TheoryData<int, List<Product>>
+                {
+                    {45, [productA, productA, productA, productC] },
+                    {95, [productA, productA, productA, productC, productB, productB, productB] },
+                    {50, [productA, productA, productA, productA, productA, productA]}
+                };
+            }
+
             private static readonly Product productA = new()
             {
                 Id = 0,
